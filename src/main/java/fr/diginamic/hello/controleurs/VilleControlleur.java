@@ -15,24 +15,45 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.diginamic.hello.villes.Villes;
+import fr.diginamic.hello.villes.VillesServices;//import de la classe VillesServices
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/ville")
+
 public class VilleControlleur {
 
+	VillesServices VS;//Pour utiliser les methodes de la classe
+	Villes V;//pour utiliser le constructeur de Villes
 	public List<Villes> liste = new ArrayList<>();//initialiser obligatoire
+	@PersistenceContext
+	private EntityManager em;
+	
+	//public EntityTransaction transaction;
 	
 	
 	public VilleControlleur() {//constructeur pour classe
-		liste.add(new Villes(1,"Nimes",150000));
-		liste.add(new Villes(2,"Montpellier",250000));
+		
+		//FAIRE AVEC BDD VIDE ET LISTE DE VILLES VIDE
+		liste.add(new Villes("Nimes",150000));
+		liste.add(new Villes("Montpellier",250000));
 	}
+	@Transactional
 	@GetMapping("/afficher")//->OK
 	public List<Villes> afficherVilles() {
+		//**VS = new VillesServices();
+		//VS.OuvrirConnexion();
+		//VS.afficherVille();
 		return liste;
 		
 	}
+	
+	@Transactional
 	@GetMapping("/afficher/{nom}")
 	public Villes afficherVilleNom(@PathVariable String nom){//PathVariable
 		Villes nomVille = null;
@@ -46,6 +67,8 @@ public class VilleControlleur {
 		}
 		return vil;
 	}
+	
+	@Transactional
 	@GetMapping("/afficherId/{id}")
 	public Villes afficherVilleId(@PathVariable int id){//PathVariable
 		Villes nomVille = null;
@@ -61,9 +84,10 @@ public class VilleControlleur {
 		return vil;
 	}
 	//
-	@PostMapping("/ajouter/{id},{nom},{nbHabitants}")
-	public ResponseEntity<?> insererVille(@Valid @PathVariable int id,@Valid @PathVariable String nom,@Valid @PathVariable int nbHabitants){
-		 Villes copieVille = new Villes(id,nom,nbHabitants);//-> POSTMAN=OK,Navigateur!=OK
+	@Transactional
+	@PostMapping("/ajouter/{id},{nom},{nbHabitants}")//??{id}
+	public ResponseEntity<?> insererVille(@Valid @PathVariable int id, @Valid @PathVariable String nom,@Valid @PathVariable int nbHabitants){
+		 Villes copieVille = new Villes(id, nom, nbHabitants);//-> POSTMAN=OK,Navigateur!=OK
 		 boolean res = true;
 		 Villes villeLue = null;
 		 for(Villes villes : liste) {
@@ -76,20 +100,29 @@ public class VilleControlleur {
 			 return ResponseEntity.badRequest().body("Cette ville éxiste déja!!");
 		 }
 		 else {
-			  liste.add(copieVille);
+			  VS = new VillesServices();
+			  liste.add(copieVille);//Ok pour postman OK web/BDD??
+			  V = new Villes();
+			  V.setNom(nom);
+			  V.setNbHabitants(nbHabitants);
+			  VS.ajouterVille(nom, nbHabitants);
+			  if(em.isOpen()==true) {
+				   em.persist(V);//OK
+			  }
 			  return ResponseEntity.ok("Ville inserée avec succès!!");
 		 }
 	}
 	
-	 @PutMapping("/modifier/{id},{nom},{nbHabitants}")//->OK
-	public ResponseEntity<?> modifierVille(@Valid @PathVariable int id,@Valid @PathVariable String nom,@Valid @PathVariable int nbHabitants){
-		Villes copieVille = new Villes(id,nom,nbHabitants);//-> POSTMAN=OK,Navigateur!=OK
+	@Transactional
+	@PutMapping("/modifier/{id},{nom},{nbHabitants}")//->OK
+	public ResponseEntity<?> modifierVille(@Valid @PathVariable int id, @Valid @PathVariable String nom,@Valid @PathVariable int nbHabitants){
+		Villes copieVille = new Villes(nom,nbHabitants);//-> POSTMAN=OK,Navigateur!=OK
 		 boolean res = false;
 		 Villes villeLue = null;
 		 for(Villes villes : liste) {
 			 villeLue = villes;
 			 if(copieVille.getId() == villeLue.getId()) {
-				 copieVille.setId(id);
+				 //copieVille.setId(id);
 				 copieVille.setNom(nom);
 				 copieVille.setNbHabitants(nbHabitants);
 				 liste.set((id-1),copieVille);
@@ -104,7 +137,7 @@ public class VilleControlleur {
 		 }
 	} 
 	 
-	
+	@Transactional
 	@DeleteMapping("/supprimer/{id}")
 	public String supprimerVille(@Valid @PathVariable int id){
 		 boolean res = false;
@@ -126,6 +159,5 @@ public class VilleControlleur {
 		 }
 		 return resultat;
 	}
-		
 	
 }
