@@ -19,6 +19,8 @@ import fr.diginamic.hello.villes.VillesServices;//import de la classe VillesServ
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
@@ -32,62 +34,73 @@ public class VilleControlleur {
 	Villes V;//pour utiliser le constructeur de Villes
 	public List<Villes> liste = new ArrayList<>();//initialiser obligatoire
 	@PersistenceContext
-	private EntityManager em;
-	
+	//private EntityManager em;
+	EntityManager em;
 	//public EntityTransaction transaction;
 	
 	
 	public VilleControlleur() {//constructeur pour classe
 		
 		//FAIRE AVEC BDD VIDE ET LISTE DE VILLES VIDE
-		liste.add(new Villes("Nimes",150000));
-		liste.add(new Villes("Montpellier",250000));
+		System.out.println("constructeur(BDD): "+liste.size());
+		//**liste.add(new Villes("Nimes",150000));
+		//**liste.add(new Villes("Montpellier",250000));
 	}
+	/**
+	 * methode pour afficher la liste des villes
+	 * @return liste (type List<Villes>)
+	 */
 	@Transactional
 	@GetMapping("/afficher")//->OK
-	public List<Villes> afficherVilles() {
-		//**VS = new VillesServices();
-		//VS.OuvrirConnexion();
-		//VS.afficherVille();
+	public List<Villes> extractsVilles() {
+		
+			TypedQuery<Villes> query = em.createQuery("SELECT v FROM Villes v",Villes.class); 
+			liste = query.getResultList();
+			//System.out.println("rechercher ville liste : "+liste.size());
 		return liste;
 		
 	}
 	
+	/**
+	 * methode d'affichage d'un objet ville apres recherche par nom
+	 * @param nom
+	 * @return 1 objet ville si il éxiste
+	 */
 	@Transactional
 	@GetMapping("/afficher/{nom}")
 	public Villes afficherVilleNom(@PathVariable String nom){//PathVariable
-		Villes nomVille = null;
-		Villes vil = new Villes();
-		for(Villes ville : liste) {
-			 nomVille = ville;
-			 if(nom.equals(nomVille.getNom().toString())==true) {
-				vil.setNom(ville.getNom());
-				vil.setNbHabitants(ville.getNbHabitants());
-			 } 
-		}
+		TypedQuery<Villes> query = em.createQuery("Select vil FROM Villes vil WHERE vil.nom = :nom",Villes.class); 
+		query.setParameter("nom",nom);
+		Villes vil = query.getSingleResult();
 		return vil;
 	}
 	
+	/**
+	 * methode pour afficher un objet ville apres recherche par id
+	 * @param id
+	 * @return 1 objet ville
+	 */
 	@Transactional
 	@GetMapping("/afficherId/{id}")
 	public Villes afficherVilleId(@PathVariable int id){//PathVariable
-		Villes nomVille = null;
-		Villes vil = new Villes();
-		for(Villes ville : liste) {
-			 nomVille = ville;
-			 if(id == nomVille.getId()) {
-				 vil.setId(ville.getId());
-				vil.setNom(ville.getNom());
-				vil.setNbHabitants(ville.getNbHabitants());
-			 } 
-		}
+		//Villes vil = new Villes();
+		TypedQuery<Villes> query = em.createQuery("Select vil FROM Villes vil WHERE vil.id = :id",Villes.class); 
+		query.setParameter("id",id);
+		Villes vil = query.getSingleResult();
 		return vil;
 	}
 	//
+	/**
+	 * methode pour ajouter un objet ville en base de donnée
+	 * @param id type integer mais créé par la base de donnée(auto-increment)
+	 * @param nom
+	 * @param nbHabitants
+	 * @return message de type ResponsesEntity (2 statuts: ok, badRequest)
+	 */
 	@Transactional
-	@PostMapping("/ajouter/{id},{nom},{nbHabitants}")//??{id}
-	public ResponseEntity<?> insererVille(@Valid @PathVariable int id, @Valid @PathVariable String nom,@Valid @PathVariable int nbHabitants){
-		 Villes copieVille = new Villes(id, nom, nbHabitants);//-> POSTMAN=OK,Navigateur!=OK
+	@PostMapping("/ajouter/{nom},{nbHabitants}")//??{id}+@Valid @PathVariable int id, 
+	public ResponseEntity<?> insererVille(@Valid @PathVariable String nom,@Valid @PathVariable int nbHabitants){
+		 Villes copieVille = new Villes(nom, nbHabitants);//-> POSTMAN=OK,Navigateur!=OK
 		 boolean res = true;
 		 Villes villeLue = null;
 		 for(Villes villes : liste) {
@@ -113,51 +126,72 @@ public class VilleControlleur {
 		 }
 	}
 	
+	/**
+	 * methode de modification d'objet villes
+	 * Postman: OK
+	 * Navigateur: OK
+	 * @param id
+	 * @param nom
+	 * @param nbHabitants
+	 * @return message de type ResponseEntity (2 statuts: ok, badRequest)
+	 */
 	@Transactional
 	@PutMapping("/modifier/{id},{nom},{nbHabitants}")//->OK
 	public ResponseEntity<?> modifierVille(@Valid @PathVariable int id, @Valid @PathVariable String nom,@Valid @PathVariable int nbHabitants){
-		Villes copieVille = new Villes(nom,nbHabitants);//-> POSTMAN=OK,Navigateur!=OK
+		//ResponseEntity<?>
+		//Villes copieVille = new Villes(nom,nbHabitants);//-> POSTMAN=OK,Navigateur!=OK
 		 boolean res = false;
-		 Villes villeLue = null;
-		 for(Villes villes : liste) {
-			 villeLue = villes;
-			 if(copieVille.getId() == villeLue.getId()) {
-				 //copieVille.setId(id);
-				 copieVille.setNom(nom);
-				 copieVille.setNbHabitants(nbHabitants);
-				 liste.set((id-1),copieVille);
-				 res=true;
-			 }
-		 }
+		TypedQuery<Villes> query = em.createQuery("SELECT vil FROM Villes vil WHERE vil.id = :id",Villes.class); 
+		query.setParameter("id",id);
+		Villes vilmodif = query.getSingleResult();
+		if(vilmodif!=null) {
+			Query query2 = em.createQuery("UPDATE Villes vil SET vil.nom= :newnom  WHERE vil.nom= :oldnom");
+			query2.setParameter("newnom",nom);
+			query2.setParameter("oldnom",vilmodif.getNom());
+			query2.executeUpdate();
+			query2 = em.createQuery("UPDATE Villes vil SET vil.nbHabitants= :newnb  WHERE vil.nbHabitants= :oldnb");
+			query2.setParameter("newnb",nbHabitants);
+			query2.setParameter("oldnb",vilmodif.getNbHabitants());
+			query2.executeUpdate();
+			res=true;
+		}
+		
 		 if(res==true) {
 			 return ResponseEntity.ok("Ville modifiée avec succès!!");
 		 }
-		 else{
+		 else {
 			 return ResponseEntity.badRequest().body("Problème lors de la modification!!");
 		 }
+		 
 	} 
 	 
+	/**
+	 * methode de suppréssion d'une instance de Villes
+	 * Postman = OK,
+	 * Navigateur = OK
+	 * @param id
+	 * @return message de type ResponseEntity(2 statuts:ok, badRequest)
+	 */
 	@Transactional
 	@DeleteMapping("/supprimer/{id}")
-	public String supprimerVille(@Valid @PathVariable int id){
+	public ResponseEntity<?> supprimerVille(@Valid @PathVariable int id){
 		 boolean res = false;
-		 String resultat = null;
-		 Villes villeLue = null;
-		 for(Villes villes : liste) {
-			 villeLue = villes;
-			 if(id == villeLue.getId()) {
-				 liste.remove((id-1));//retrait dans List
-				 res=true;
-				 break;
-			 }
+		 TypedQuery<Villes> query = em.createQuery("SELECT vil FROM Villes vil WHERE vil.id = :id",Villes.class); 
+		 query.setParameter("id",id);
+		 Villes vilsup = query.getSingleResult();
+		 if(vilsup!=null) {
+			 Query query2 = em.createQuery("DELETE FROM Villes vil WHERE vil.id= :id");
+			query2.setParameter("id",id);
+			query2.executeUpdate();
+			 res=true;
 		 }
-		 if(res==false) {
-			 resultat = "Problème lors de la suppréssion!!";
+		 
+		  if(res==true) {
+			 return ResponseEntity.ok("Ville supprimée avec succès!!");
 		 }
-		 else if(res==true){
-			  resultat = "Ville supprimée avec succès!!";
+		 else {
+			 return ResponseEntity.badRequest().body("Problème lors de la suppréssion!!");
 		 }
-		 return resultat;
 	}
 	
 }

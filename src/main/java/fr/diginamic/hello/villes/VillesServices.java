@@ -31,6 +31,7 @@ public class VillesServices {
 	EntityManager em;
 	//@PersistenceContext
 	EntityTransaction transaction;
+	VilleDao VDAO;
 	
 	//
 	/**
@@ -43,15 +44,19 @@ public class VillesServices {
 		System.out.println("cons de VillesServices!");
 	}
 	
-	
+	/*
 	@Transactional
 	public void OuvrirConnexion() {
 		//Ouverture de la transaction pour le contexte de persistence
 		//transaction.begin();//ouverture de la transaction
 		
-		//
+		/*
 		System.out.println("ouvrir connexion!!");
-		System.out.println("em: "+em.toString());
+		if(em.isOpen()) {
+			System.out.println("???isOpen: "+em.isOpen());
+		}
+		else System.out.println("em: "+em.toString());
+		
 	}
 	
 	public void FermerConnexion() {
@@ -62,6 +67,7 @@ public class VillesServices {
 		//
 		System.out.println("fermer connexion!!");
 	}
+	*/
 	
 	/**
 	 * Methode d'insertion d'une ville dans la base de données
@@ -83,15 +89,17 @@ public class VillesServices {
 	 */
 	@Transactional
 	public List<Villes> afficherVille() {
-		OuvrirConnexion();
+		
 		List<Villes> liste = new ArrayList<>();
-		Query query =  em.createQuery("SELECT v FROM Villes"); 
+		/*
+		TypedQuery query = em.createQuery("SELECT v FROM Villes",Villes.class); 
 		liste = query.getResultList();
-		if(liste.size()==0) {
-			System.out.println("size=0");
-			return null;
-		}
-		else return liste;
+		//em.persist(liste);
+		*/
+		
+			return VDAO.extractVille();
+		
+	
 	}
 	
 	/**
@@ -152,4 +160,17 @@ public class VillesServices {
 	public void supprimerVilleId() {
 		
 	}
+
+	
+	public List<Villes> insertVille(String nom, int nbHabitants) {
+		// TODO Auto-generated method stub
+		List<Villes> list = null;
+		Villes ville = new Villes();
+		ville.setNom(nom);
+		ville.setNbHabitants(nbHabitants);
+		System.out.println("ajouterVille VS nom: "+nom+" nb: "+nbHabitants);
+		return list;
+	}
+
+
 }
