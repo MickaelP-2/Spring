@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+//import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+//import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.diginamic.hello.villes.Villes;
-import fr.diginamic.hello.villes.VillesServices;//import de la classe VillesServices
+import fr.diginamic.hello.services.VillesServices;//import de la classe VillesServices
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
+//import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -28,7 +28,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/ville")
 
-public class VilleControlleur {
+public class VillesControlleur {
 
 	VillesServices VS;//Pour utiliser les methodes de la classe
 	Villes V;//pour utiliser le constructeur de Villes
@@ -39,7 +39,7 @@ public class VilleControlleur {
 	//public EntityTransaction transaction;
 	
 	
-	public VilleControlleur() {//constructeur pour classe
+	public VillesControlleur() {//constructeur pour classe
 		
 		//FAIRE AVEC BDD VIDE ET LISTE DE VILLES VIDE
 		System.out.println("constructeur(BDD): "+liste.size());

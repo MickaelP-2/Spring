@@ -75,7 +75,12 @@
  			<artifactId>hibernate-core</artifactId>
  			<version>6.5.2.Final</version>
 		</dependency>
-	
+
+		<dependency>
+			<groupId>fr.diginamic</groupId>
+			<artifactId>java-design-patterns</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	
 	

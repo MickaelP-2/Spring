@@ -1,18 +1,20 @@
-package fr.diginamic.hello.villes;
+package fr.diginamic.hello.services;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import fr.diginamic.hello.controleurs.VilleControlleur;
+//import fr.diginamic.hello.controleurs.VillesControlleur;
+import fr.diginamic.hello.villes.VilleDao;
+import fr.diginamic.hello.villes.Villes;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
+//import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
+//import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
+//import jakarta.persistence.Query;
+//import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 
 /**
@@ -30,44 +32,16 @@ public class VillesServices {
 	@PersistenceContext
 	EntityManager em;
 	//@PersistenceContext
-	EntityTransaction transaction;
+	//EntityTransaction transaction;
 	VilleDao VDAO;
 	
 	//
 	/**
-	 * Constructeur
+	 * Constructeur utilisé pour accéder aux méthodes de la classe
 	 */
 	public VillesServices() {
-		//entityManagerFactory = Persistence.createEntityManagerFactory("");//???nom = config1
-		//em = EntityManagerFactory.createEntityManager();
-		//transaction = em.getTransaction();
 		System.out.println("cons de VillesServices!");
 	}
-	
-	/*
-	@Transactional
-	public void OuvrirConnexion() {
-		//Ouverture de la transaction pour le contexte de persistence
-		//transaction.begin();//ouverture de la transaction
-		
-		/*
-		System.out.println("ouvrir connexion!!");
-		if(em.isOpen()) {
-			System.out.println("???isOpen: "+em.isOpen());
-		}
-		else System.out.println("em: "+em.toString());
-		
-	}
-	
-	public void FermerConnexion() {
-		 
-		//Ouverture de la transaction pour le contexte de persistence
-		//*****transaction.commit();//action de la transaction
-		em.close();//Pour fermer le flux entityManager
-		//
-		System.out.println("fermer connexion!!");
-	}
-	*/
 	
 	/**
 	 * Methode d'insertion d'une ville dans la base de données
@@ -90,7 +64,7 @@ public class VillesServices {
 	@Transactional
 	public List<Villes> afficherVille() {
 		
-		List<Villes> liste = new ArrayList<>();
+		//List<Villes> liste = new ArrayList<>();
 		/*
 		TypedQuery query = em.createQuery("SELECT v FROM Villes",Villes.class); 
 		liste = query.getResultList();

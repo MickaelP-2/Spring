@@ -1,9 +1,7 @@
 package fr.diginamic.hello.villes;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -75,7 +73,7 @@ public class VilleDao {
 	
 	@Transactional
 	public List<Villes> suprimerVille(Integer id) {
-		TypedQuery<Villes> query = em.createQuery("DELETE FROM Results rs WHERE rs.id= :id",Villes.class);
+		TypedQuery<Villes> query = em.createQuery("DELETE FROM Ville v WHERE v.id= :id",Villes.class);
 		query.setParameter("id",id);
 		query.executeUpdate();
 		query = em.createQuery("Select v FROM Villes vil",Villes.class);

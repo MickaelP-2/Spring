@@ -47,7 +47,7 @@ public class Villes {
 	private int nbHabitants;
 	//
 	/**
-	 * Constructeur sans arguments utilisé par ibernate
+	 * Constructeur sans arguments utilisé par hibernate
 	 */
 	public Villes() {
 		
@@ -134,6 +134,7 @@ public class Villes {
 	/**
 	 * Methode de comparaison de villes pour un classement par population
 	 */
+	
 	public static Comparator<Villes> comparateurHabitants = new Comparator<Villes>(){
 		@Override
 		public int compare(Villes v1, Villes v2) {
@@ -145,6 +146,7 @@ public class Villes {
 	/**
 	 * Methode  de comparaison de villes pour un classement par ordre alphabetique
 	 */
+	
 	public static Comparator<Villes> comparateurNom = new Comparator<Villes>(){
 		@Override
 		public int compare(Villes v1, Villes v2) {
